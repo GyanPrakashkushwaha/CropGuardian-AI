@@ -18,6 +18,6 @@ class CropDisease(BaseModel):
 
 
     
-model = get_gemini_model(temperature=0.1).with_structured_output(CropDisease)
+vision_agent = get_gemini_model(temperature=0.1).with_structured_output(CropDisease)
 
 # res = model.invoke(prompt)
