@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile
 # from backend.app.services.gemini_client import get_gemini_model
 from backend.app.agents.vision_agent import VISION_AGENT_SYSTEM_PROMPT, vision_agent
 from base64 import b64encode
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 router = APIRouter()
 
@@ -14,17 +14,13 @@ async def vision_crop(image: UploadFile):
     human_msg = HumanMessage(
         content = [
             {
-                "type": "text", 
-                "text": VISION_AGENT_SYSTEM_PROMPT
-            },
-            {
                 "type": "image",
                 "base64": img_b64,
                 "mime_type": "image/png"
             }
         ]
     )
-    
-    res = vision_agent.invoke([human_msg])
+    system_message = SystemMessage(content = VISION_AGENT_SYSTEM_PROMPT)
+    res = vision_agent.invoke([system_message, human_msg])
     
     return {"response": getattr(res, "content", None) or getattr(res, "content_blocks", res)}

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from backend.app.agents.agronomy_agent import AGRONOMY_AGENT_SYSTEM_PROMPT, agronomy_agent
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 import json
 
 router = APIRouter()
@@ -15,15 +15,15 @@ async def agronomy_handler(req: AgronomyRequest):
     crop_disease_json = json.dumps(req.crop_disease)
     weather_json = json.dumps(req.weather)
     
+    system_message = SystemMessage(content=AGRONOMY_AGENT_SYSTEM_PROMPT)
     human_msg = HumanMessage(
         content=[
-            {"type": "text", "text": AGRONOMY_AGENT_SYSTEM_PROMPT},   
             {"type": "text", "text": crop_disease_json},              # send JSON as text block
             {"type": "text", "text": weather_json},
         ]
     )
     try:
-        res = agronomy_agent.invoke([human_msg])  # synchronous invoke
+        res = agronomy_agent.invoke([system_message, human_msg])  # synchronous invoke
     except TypeError:
         # 2) If agronomy_agent is an agent (LangGraph/agent), pass a dict with messages and await
         res = await agronomy_agent.invoke({"messages": [human_msg]})
