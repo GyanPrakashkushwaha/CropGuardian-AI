@@ -17,7 +17,6 @@ class CropDisease(BaseModel):
     recommended_actions: List[str] = Field(default_factory=list, description="Actionable steps a farmer should take immediately (WITHOUT chemicals)")
 
 
-    
 vision_agent = get_gemini_model(temperature=0.1).with_structured_output(CropDisease)
 
 # res = model.invoke(prompt)
